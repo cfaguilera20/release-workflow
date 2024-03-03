@@ -1,3 +1,5 @@
+# https://stackoverflow.com/questions/73687176/permission-denied-to-github-actionsbot-the-requested-url-returned-error-403
+
 name: Release Workflow
 
 on:
@@ -6,6 +8,9 @@ on:
       commit_hash:
         description: 'Commit hash for the release branch (optional)'
         required: false
+
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -27,18 +32,22 @@ jobs:
     - name: Fetch 'develop' branch
       run: git fetch origin develop:develop
 
+    - name: Delete existing 'release' branch on remote
+      run: git push --delete origin release || echo "Branch does not exist on remote"
+
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
         commit_hash=${{ inputs.commit_hash }}
+        git checkout develop
+        git pull origin develop
+
         if [ -n "$commit_hash" ]; then
-          git checkout -b release $commit_hash
-        else
-          git checkout develop
-          git pull origin develop
-          git checkout -b release
-          git push -u origin release
+          git fetch origin $commit_hash && git checkout $commit_hash
         fi
+
+        git checkout -b release
+        git push -u origin release --force
 
     - name: Phase 2 - Your Second Command
       run: |
