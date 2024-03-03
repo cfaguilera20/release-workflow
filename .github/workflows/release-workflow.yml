@@ -1,0 +1,40 @@
+name: Release Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Git
+      run: |
+        git config user.email "your-email@example.com"
+        git config user.name "Your Name"
+
+    - name: Phase 1 - Create Release Branch
+      id: phase1
+      run: |
+        commit_hash=${{ inputs.commit_hash }}
+        if [ -n "$commit_hash" ]; then
+          git checkout -b release $commit_hash
+        else
+          git checkout develop
+          git pull
+          git checkout -b release
+          git push -u origin release
+        fi
+
+    - name: Phase 2 - Your Second Command
+      run: |
+        # Your second command here
+
+    - name: Phase 3 - Your Third Command
+      run: |
+        # Your third command here
