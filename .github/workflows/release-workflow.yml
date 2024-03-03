@@ -23,6 +23,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set up environment
+      run: |
+        auth_string="${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}"
+
     - name: Set up Git
       run: |
         git config user.email "${{ github.actor }}@users.noreply.github.com"
@@ -55,7 +59,7 @@ jobs:
     - name: Phase 2 - Change Log
       run: |
         # Clone clog repository
-        git clone https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/apptegy/clog.git || git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/apptegy/clog.git || git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/apptegy/clog.git
+        git clone https://${{ auth_string }}@github.com/apptegy/clog.git
 
 
         # Build the Docker image
