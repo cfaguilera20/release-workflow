@@ -1,9 +1,7 @@
 name: Release Workflow
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   release:
@@ -23,18 +21,3 @@ jobs:
       run: |
         commit_hash=${{ inputs.commit_hash }}
         if [ -n "$commit_hash" ]; then
-          git checkout -b release $commit_hash
-        else
-          git checkout develop
-          git pull
-          git checkout -b release
-          git push -u origin release
-        fi
-
-    - name: Phase 2 - Your Second Command
-      run: |
-        # Your second command here
-
-    - name: Phase 3 - Your Third Command
-      run: |
-        # Your third command here
