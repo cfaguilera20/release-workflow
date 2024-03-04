@@ -67,7 +67,7 @@ jobs:
         # Example usage of clog without the removed line
         clog -a ${{ secrets.GITHUB_TOKEN }} -r apptegy/${{ inputs.repo_name }} -f release -t master > changelog.txt
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.CFA_PAT }}
 
     - name: Phase 3 - Release Pull Request
       run: |
