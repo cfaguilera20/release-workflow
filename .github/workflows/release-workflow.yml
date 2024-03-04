@@ -55,9 +55,9 @@ jobs:
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
-        mkdir workspace
-        gh repo clone ${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
-        cd workspace/${{ inputs.repo_name }}
+        short_repo=$(echo ${{ inputs.repo_name }} | cut -d'/' -f2)
+        gh repo clone ${{ inputs.repo_name }} workspace/${{ short_repo }}
+        cd workspace/${{ short_repo }}
 
         commit_hash=${{ inputs.commit_hash }}
         git fetch && git checkout ${{ inputs.DEVELOP_BRANCH }}
@@ -74,7 +74,8 @@ jobs:
 
     - name: Phase 2 - Change Log
       run: |
-        cd workspace/${{ inputs.repo_name }}
+        short_repo=$(echo ${{ inputs.repo_name }} | cut -d'/' -f2)
+        cd workspace/${{ short_repo }}
 
         # Clone clog repository
         gh repo clone apptegy/clog
@@ -90,7 +91,8 @@ jobs:
 
     - name: Phase 3 - Release Pull Request
       run: |
-        cd workspace/${{ inputs.repo_name }}
+        short_repo=$(echo ${{ inputs.repo_name }} | cut -d'/' -f2)
+        cd workspace/${{ short_repo }}
 
         # Create a pull request using GitHub CLI
         pr_title=$(head -n 1 changelog.txt)
