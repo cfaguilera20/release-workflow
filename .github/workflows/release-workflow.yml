@@ -54,7 +54,7 @@ jobs:
     - name: Phase 2 - Change Log
       run: |
         # Clone clog repository
-        git clone git@github.com:apptegy/clog.git
+        git clone https://github.com/apptegy/clog.git
 
         # Build the Docker image
         docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
