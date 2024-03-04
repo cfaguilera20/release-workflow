@@ -1,5 +1,3 @@
-# https://stackoverflow.com/questions/73687176/permission-denied-to-github-actionsbot-the-requested-url-returned-error-403
-
 name: Release Workflow
 
 on:
@@ -8,6 +6,10 @@ on:
       commit_hash:
         description: 'Commit hash for the release branch (optional)'
         required: false
+      repo_name:
+        description: 'Repository name'
+        required: true
+        default: 'auth-service'
 
 permissions:
   contents: write
@@ -29,6 +31,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Install GitHub CLI
+      run: |
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+        sudo apt-add-repository https://cli.github.com/packages
+        sudo apt-get update
+        sudo apt-get install gh
+
     - name: Fetch 'develop' branch
       run: git fetch origin develop:develop
 
@@ -49,10 +58,23 @@ jobs:
 
         git push -u origin release --force
 
-    - name: Phase 2 - Your Second Command
+    - name: Phase 2 - Change Log
       run: |
-        # Your second command here
+        # Clone clog repository
+        git clone git@github.com:apptegy/clog.git
 
-    - name: Phase 3 - Your Third Command
+        # Build the Docker image
+        docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
+
+        # Alias clog command
+        alias clog='docker run --rm -it 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest'
+
+        # Example usage of clog without the removed line
+        clog -a ${{ secrets.GITHUB_TOKEN }} -r apptegy/${{ inputs.repo_name }} -f release -t master > changelog.txt
+
+    - name: Phase 3 - Release Pull Request
       run: |
-        # Your third command here
+        # Create a pull request using GitHub CLI
+        pr_title=$(head -n 1 changelog.txt)
+        pr_body=$(cat changelog.txt)
+        gh pr create --base main --head release --title "$pr_title" --body "$pr_body"

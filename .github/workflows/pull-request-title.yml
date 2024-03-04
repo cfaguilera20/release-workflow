@@ -1,3 +1,5 @@
+name: PR Title validation
+
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened, ready_for_review]
