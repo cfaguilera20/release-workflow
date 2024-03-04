@@ -22,15 +22,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Git
-      run: |
-        git config user.email "${{ github.actor }}@users.noreply.github.com"
-        git config user.name "${{ github.actor }}"
-        git config credential.helper 'store --file=.git-credentials'
-        echo "https://${{ secrets.GITHUB_TOKEN }}@github.com" > .git-credentials
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Install GitHub CLI
       run: |
         sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
