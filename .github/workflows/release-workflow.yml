@@ -79,6 +79,9 @@ jobs:
 
     - name: Phase 2 - Change Log
       run: |
+        # Working directory
+        cd workspace/${{ inputs.repo_name }}
+
         # Clone clog repository
         gh repo clone apptegy/clog
 
@@ -93,6 +96,7 @@ jobs:
 
     - name: Phase 3 - Release Pull Request
       run: |
+        # Working directory
         cd workspace/${{ inputs.repo_name }}
 
         # Create a pull request using GitHub CLI
