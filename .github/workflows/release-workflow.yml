@@ -10,10 +10,14 @@ on:
       commit_hash:
         description: 'Commit hash for the release branch (optional)'
         required: false
+      account:
+        description: 'GitHub account name'
+        required: true
+        default: 'apptegy'
       repo_name:
         description: 'Repository name'
         required: true
-        default: 'apptegy/auth-service'
+        default: 'auth-service'
       base_branch:
         description: 'Base branch to change log from'
         required: true
@@ -48,15 +52,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Delete existing 'release' branch on remote
-      run: gh repo delete-branch ${{ inputs.repo_name }}/${{ inputs.release_branch }} || echo "Branch does not exist on remote"
+      run: gh repo delete-branch ${{ inputs.account_name }}/${{ inputs.release_branch }} || echo "Branch does not exist on remote"
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
 
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
-        short_repo=$(echo "${{ inputs.repo_name }}" | cut -d'/' -f2)
-        gh repo clone ${{ inputs.repo_name }} workspace/${{ short_repo }}
+        gh repo clone ${{ inputs.account_name }}/${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
         cd workspace/${{ short_repo }}
 
         commit_hash=${{ inputs.commit_hash }}
@@ -74,9 +77,6 @@ jobs:
 
     - name: Phase 2 - Change Log
       run: |
-        short_repo=$(echo "${{ inputs.repo_name }}" | cut -d'/' -f2)
-        cd workspace/${{ short_repo }}
-
         # Clone clog repository
         gh repo clone apptegy/clog
 
@@ -85,14 +85,13 @@ jobs:
         docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
 
         # Example usage of clog without the removed line
-        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.repo_name }} -f release -t ${{ inputs.BASE_BRANCH }} > changelog.txt
+        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.account_name }}/${{ inputs.repo_name }} -f release -t ${{ inputs.BASE_BRANCH }} > changelog.txt
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
 
     - name: Phase 3 - Release Pull Request
       run: |
-        short_repo=$(echo "${{ inputs.repo_name }}" | cut -d'/' -f2)
-        cd workspace/${{ short_repo }}
+        cd workspace/${{ inputs.repo_name }}
 
         # Create a pull request using GitHub CLI
         pr_title=$(head -n 1 changelog.txt)
