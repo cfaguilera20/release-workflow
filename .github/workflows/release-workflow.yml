@@ -1,3 +1,4 @@
+# Repo settings Actions permissions: Allow all actions and reusable workflows
 name: Release Workflow
 
 on:
@@ -54,8 +55,7 @@ jobs:
     - name: Phase 2 - Change Log
       run: |
         # Clone clog repository
-        git clone https://x-access-token:${secrets.GITHUB_TOKEN}@github.com/apptegy/clog.git
-        git clone https://${secrets.GITHUB_TOKEN}@github.com/apptegy/clog.git
+        git clone https://${{ github.actor }}:${secrets.GITHUB_TOKEN}@github.com/apptegy/clog.git
 
         # Build the Docker image
         docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
