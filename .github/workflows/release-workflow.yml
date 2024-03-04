@@ -22,12 +22,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install GitHub CLI
+    - name: Set up Git
       run: |
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-        sudo apt-add-repository https://cli.github.com/packages
-        sudo apt-get update
-        sudo apt-get install gh
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+        git config user.name "${{ github.actor }}"
+        git config credential.helper 'store --file=.git-credentials'
+        echo "https://${{ secrets.GITHUB_TOKEN }}@github.com" > .git-credentials
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Fetch 'develop' branch
       run: git fetch origin develop:develop
