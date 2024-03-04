@@ -60,7 +60,7 @@ jobs:
       id: phase1
       run: |
         gh repo clone ${{ inputs.account_name }}/${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
-        cd workspace/${{ short_repo }}
+        cd workspace/${{ inputs.repo_name }}
 
         commit_hash=${{ inputs.commit_hash }}
         git fetch && git checkout ${{ inputs.DEVELOP_BRANCH }}
