@@ -55,8 +55,8 @@ jobs:
     - name: Phase 2 - Change Log
       run: |
         # Clone clog repository
-        auth_string="${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}"
-        git clone https://${{ auth_string }}@github.com/apptegy/clog.git
+        export AUTH_SERVICE="${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}"
+        git clone https://${AUTH_SERVICE}@github.com/apptegy/clog.git
 
 
         # Build the Docker image
