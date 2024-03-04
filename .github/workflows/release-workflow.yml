@@ -25,7 +25,7 @@ on:
       release_branch:
         description: 'Release branch to create'
         required: false
-        default: 'release
+        default: 'release'
 
 permissions:
   contents: write
