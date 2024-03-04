@@ -1,0 +1,17 @@
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+permissions:
+  pull-requests: read
+jobs:
+  pr-title:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Pull Request title
+      uses: deepakputhraya/action-pr-title@v1.0.2
+      with:
+        regex: '((\[(PLAT|DEVOPS|ROOMS|THRILL|RCB|RV2|ENG|ILNK)-\d+\]|\[NO-TICKET\])\s.+)|Auth\sService\sv\d+' # Regex the title should match.
+        allowed_prefixes: '' # title should start with the given prefix
+        prefix_case_sensitive: true # title prefix are case insensitive
+        min_length: 5 # Min length of the title
+        max_length: 70 # Max length of the title
