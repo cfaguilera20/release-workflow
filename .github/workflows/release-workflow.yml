@@ -41,12 +41,12 @@ jobs:
         commit_hash=${{ inputs.commit_hash }}
         git checkout develop
         git pull origin develop
+        git checkout -b release
 
         if [ -n "$commit_hash" ]; then
-          git fetch origin $commit_hash && git checkout $commit_hash
+          git reset --hard $commit_hash
         fi
 
-        git checkout -b release
         git push -u origin release --force
 
     - name: Phase 2 - Your Second Command
