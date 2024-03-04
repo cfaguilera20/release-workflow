@@ -59,7 +59,8 @@ jobs:
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
-        gh repo clone https://github.com/${{ inputs.github_account }}/${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
+        mkdir -p workspace
+        gh repo clone ${{ inputs.github_account }}/${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
         cd workspace/${{ inputs.repo_name }}
 
         commit_hash=${{ inputs.commit_hash }}
