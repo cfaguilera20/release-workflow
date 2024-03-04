@@ -21,8 +21,8 @@ jobs:
         git config user.name "${{ github.actor }}"
         git config credential.helper 'store --file=.git-credentials'
         echo "https://${{ secrets.YOUR_PAT_SECRET_NAME }}@github.com" > .git-credentials
-      env:
-        YOUR_PAT_SECRET_NAME: ${{ secrets.YOUR_PAT_SECRET_NAME }}
+    env:
+      YOUR_PAT_SECRET_NAME: ${{ secrets.YOUR_PAT_SECRET_NAME }}
 
     - name: Phase 1 - Create Release Branch
       id: phase1
