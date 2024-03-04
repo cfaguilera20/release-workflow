@@ -65,7 +65,7 @@ jobs:
         docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
 
         # Example usage of clog without the removed line
-        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ secrets.GITHUB_TOKEN }} -r apptegy/${{ inputs.repo_name }} -f release -t master > changelog.txt
+        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ GH_TOKEN }} -r apptegy/${{ inputs.repo_name }} -f release -t master > changelog.txt
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
 
