@@ -60,7 +60,8 @@ jobs:
       id: phase1
       run: |
         mkdir -p workspace
-        git clone git@github.com:${{ inputs.github_account }}/${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
+        git clone https://{{ env.GH_TOKEN }}@github.com/${{ inputs.github_account }}/${{ inputs.repo_name }}.git workspace/${{ inputs.repo_name }}
+
         cd workspace/${{ inputs.repo_name }}
 
         commit_hash=${{ inputs.commit_hash }}
