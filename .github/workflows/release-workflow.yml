@@ -14,6 +14,18 @@ on:
         description: 'Repository name'
         required: true
         default: 'apptegy/auth-service'
+      base_branch:
+        description: 'Base branch to change log from'
+        required: true
+        default: 'master'
+      develop_branch:
+        description: 'Develop branch to merge to generate the release branch'
+        required: true
+        default: 'develop'
+      release_branch:
+        description: 'Release branch to create'
+        required: false
+        default: 'release
 
 permissions:
   contents: write
@@ -36,24 +48,24 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Fetch 'develop' branch
-      run: git fetch origin develop:develop
+      run: git fetch origin ${{ input.DEVELOP_BRANCH }}:${{ input.DEVELOP_BRANCH }}
 
     - name: Delete existing 'release' branch on remote
-      run: git push --delete origin release || echo "Branch does not exist on remote"
+      run: git push --delete ${{ input.RELEASE_BRANCH }} release || echo "Branch does not exist on remote"
 
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
         commit_hash=${{ inputs.commit_hash }}
-        git checkout develop
-        git pull origin develop
-        git checkout -b release
+        git checkout dev${{ input.DEVELOP_BRANCH }}
+        git pull origin ${{ input.DEVELOP_BRANCH }}
+        git checkout -b ${{ input.RELEASE_BRANCH }}
 
         if [ -n "$commit_hash" ]; then
           git reset --hard $commit_hash
         fi
 
-        git push -u origin release --force
+        git push -u origin ${{ input.RELEASE_BRANCH }} --force
 
     - name: Phase 2 - Change Log
       run: |
@@ -65,7 +77,7 @@ jobs:
         docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
 
         # Example usage of clog without the removed line
-        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.repo_name }} -f release -t master > changelog.txt
+        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.repo_name }} -f release -t ${{ input.BASE_BRANCH }} > changelog.txt
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
 
@@ -74,4 +86,4 @@ jobs:
         # Create a pull request using GitHub CLI
         pr_title=$(head -n 1 changelog.txt)
         pr_body=$(cat changelog.txt)
-        gh pr create --base main --head release --title "$pr_title" --body "$pr_body"
+        gh pr create --base ${{ input.BASE_BRANCH }} --head ${{ input.RELEASE_BRANCH }} --title "$pr_title" --body "$pr_body"
