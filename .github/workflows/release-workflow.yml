@@ -27,7 +27,7 @@ jobs:
         if [ -n "$commit_hash" ]; then
           git checkout -b release $commit_hash
         else
-          git checkout develop
+          git fetch && git checkout develop
           git pull
           git checkout -b release
           git push -u origin release
