@@ -47,9 +47,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Fetch 'develop' branch
-      run: git fetch origin ${{ input.DEVELOP_BRANCH }}:${{ input.DEVELOP_BRANCH }}
-
     - name: Delete existing 'release' branch on remote
       run: git push --delete ${{ input.RELEASE_BRANCH }} release || echo "Branch does not exist on remote"
 
@@ -57,7 +54,7 @@ jobs:
       id: phase1
       run: |
         commit_hash=${{ inputs.commit_hash }}
-        git checkout dev${{ input.DEVELOP_BRANCH }}
+        git fetch && git checkout ${{ input.DEVELOP_BRANCH }}
         git pull origin ${{ input.DEVELOP_BRANCH }}
         git checkout -b ${{ input.RELEASE_BRANCH }}
 
