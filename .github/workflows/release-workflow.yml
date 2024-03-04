@@ -84,3 +84,5 @@ jobs:
         pr_title=$(head -n 1 changelog.txt)
         pr_body=$(cat changelog.txt)
         gh pr create --base ${{ inputs.BASE_BRANCH }} --head ${{ inputs.RELEASE_BRANCH }} --title "$pr_title" --body "$pr_body"
+      env:
+        GH_TOKEN: ${{ secrets.CFA_PAT }}
