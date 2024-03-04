@@ -2,6 +2,10 @@ name: Release Workflow
 
 on:
   workflow_dispatch:
+    inputs:
+      commit_hash:
+        description: 'Commit hash for the release branch (optional)'
+        required: false
 
 jobs:
   release:
@@ -13,11 +17,26 @@ jobs:
 
     - name: Set up Git
       run: |
-        git config user.email "your-email@example.com"
-        git config user.name "Your Name"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+        git config user.name "${{ github.actor }}"
 
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
         commit_hash=${{ inputs.commit_hash }}
         if [ -n "$commit_hash" ]; then
+          git checkout -b release $commit_hash
+        else
+          git checkout develop
+          git pull
+          git checkout -b release
+          git push -u origin release
+        fi
+
+    - name: Phase 2 - Your Second Command
+      run: |
+        # Your second command here
+
+    - name: Phase 3 - Your Third Command
+      run: |
+        # Your third command here
