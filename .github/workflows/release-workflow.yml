@@ -21,6 +21,11 @@ jobs:
         git config user.name "${{ github.actor }}"
         git config credential.helper 'store --file=.git-credentials'
         echo "https://${{ secrets.GITHUB_TOKEN }}@github.com" > .git-credentials
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Fetch 'develop' branch
+      run: git fetch origin develop:develop
 
     - name: Phase 1 - Create Release Branch
       id: phase1
@@ -29,7 +34,6 @@ jobs:
         if [ -n "$commit_hash" ]; then
           git checkout -b release $commit_hash
         else
-          git fetch origin develop:develop
           git checkout develop
           git pull origin develop
           git checkout -b release
