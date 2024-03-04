@@ -1,6 +1,6 @@
 # Repo settings Actions permissions: Allow all actions and reusable workflows
 # Create a Personal Access Token (PAT) with the following permissions: repo, workflow, read:org
-# Add the PAT as a secret in the repository with the name CFA_PAT
+# Add the PAT as a secret in the repository with the name AUTH_PAT
 
 name: Release Workflow
 
@@ -48,11 +48,17 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Delete existing 'release' branch on remote
-      run: git push --delete ${{ inputs.RELEASE_BRANCH }} release || echo "Branch does not exist on remote"
+      run: gh repo delete-branch ${{ inputs.repo_name }}/${{ inputs.release_branch }} || echo "Branch does not exist on remote"
+      env:
+        GH_TOKEN: ${{ secrets.CFA_PAT }}
 
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
+        mkdir workspace
+        gh repo clone ${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
+        cd workspace/${{ inputs.repo_name }}
+
         commit_hash=${{ inputs.commit_hash }}
         git fetch && git checkout ${{ inputs.DEVELOP_BRANCH }}
         git pull origin ${{ inputs.DEVELOP_BRANCH }}
@@ -63,9 +69,13 @@ jobs:
         fi
 
         git push -u origin ${{ inputs.RELEASE_BRANCH }} --force
+      env:
+        GH_TOKEN: ${{ secrets.CFA_PAT }}
 
     - name: Phase 2 - Change Log
       run: |
+        cd workspace/${{ inputs.repo_name }}
+
         # Clone clog repository
         gh repo clone apptegy/clog
 
@@ -80,6 +90,8 @@ jobs:
 
     - name: Phase 3 - Release Pull Request
       run: |
+        cd workspace/${{ inputs.repo_name }}
+
         # Create a pull request using GitHub CLI
         pr_title=$(head -n 1 changelog.txt)
         pr_body=$(cat changelog.txt)
