@@ -10,7 +10,7 @@ on:
       commit_hash:
         description: 'Commit hash for the release branch (optional)'
         required: false
-      account:
+      github_account:
         description: 'GitHub account name'
         required: true
         default: 'apptegy'
@@ -52,14 +52,14 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Delete existing 'release' branch on remote
-      run: gh repo delete-branch ${{ inputs.account_name }}/${{ inputs.release_branch }} || echo "Branch does not exist on remote"
+      run: gh repo delete-branch ${{ inputs.github_account }}/${{ inputs.release_branch }} || echo "Branch does not exist on remote"
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
 
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
-        gh repo clone ${{ inputs.account_name }}/${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
+        gh repo clone ${{ inputs.github_account }}/${{ inputs.repo_name }} workspace/${{ inputs.repo_name }}
         cd workspace/${{ inputs.repo_name }}
 
         commit_hash=${{ inputs.commit_hash }}
@@ -85,7 +85,7 @@ jobs:
         docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
 
         # Example usage of clog without the removed line
-        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.account_name }}/${{ inputs.repo_name }} -f release -t ${{ inputs.BASE_BRANCH }} > changelog.txt
+        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.github_account }}/${{ inputs.repo_name }} -f release -t ${{ inputs.BASE_BRANCH }} > changelog.txt
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
 
