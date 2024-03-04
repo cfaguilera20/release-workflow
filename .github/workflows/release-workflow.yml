@@ -19,6 +19,10 @@ jobs:
       run: |
         git config user.email "${{ github.actor }}@users.noreply.github.com"
         git config user.name "${{ github.actor }}"
+        git config credential.helper 'store --file=.git-credentials'
+        echo "https://${{ secrets.YOUR_PAT_SECRET_NAME }}@github.com" > .git-credentials
+      env:
+        YOUR_PAT_SECRET_NAME: ${{ secrets.YOUR_PAT_SECRET_NAME }}
 
     - name: Phase 1 - Create Release Branch
       id: phase1
@@ -27,8 +31,9 @@ jobs:
         if [ -n "$commit_hash" ]; then
           git checkout -b release $commit_hash
         else
-          git fetch && git checkout develop
-          git pull
+          git fetch origin develop:develop
+          git checkout develop
+          git pull origin develop
           git checkout -b release
           git push -u origin release
         fi
