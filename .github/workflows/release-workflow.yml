@@ -120,9 +120,16 @@ jobs:
         # Working directory
         cd workspace/${{ inputs.repo_name }}
 
-        # Create a pull request using GitHub CLI
-        pr_title=$(head -n 1 changelog.txt)
-        pr_body=$(cat changelog.txt)
-        gh pr create --base ${{ inputs.BASE_BRANCH }} --head ${{ inputs.RELEASE_BRANCH }} --title "$pr_title" --body "$pr_body"
+        # Check if pull request already exists
+        pr_exists=$(gh pr list --base ${{ inputs.BASE_BRANCH }} --head ${{ inputs.RELEASE_BRANCH }} --json number | jq -r '.[].number')
+
+        if [ -z "$pr_exists" ]; then
+          # Create a pull request using GitHub CLI
+          pr_title=$(head -n 1 changelog.txt)
+          pr_body=$(cat changelog.txt)
+          gh pr create --base ${{ inputs.BASE_BRANCH }} --head ${{ inputs.RELEASE_BRANCH }} --title "$pr_title" --body "$pr_body"
+        else
+          echo "Pull request already exists"
+        fi
       env:
         GH_TOKEN: ${{ secrets.APPTEGY_PAT }}
