@@ -108,7 +108,7 @@ jobs:
 
 
         # Build the Docker image
-        docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
+        docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog-tools:latest
 
         # Example usage of clog without the removed line
         docker run --rm 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog-tools:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.github_account }}/${{ inputs.repo_name }} -f ${{ inputs.BASE_BRANCH }} -t ${{ inputs.RELEASE_BRANCH }} -s  > changelog.txt
