@@ -61,7 +61,7 @@ jobs:
         echo "Deleting release branch ${{ inputs.release_branch }}"
         gh repo delete-branch ${{ inputs.github_account }}/${{ inputs.release_branch }} || echo "Branch does not exist on remote"
       env:
-        GH_TOKEN: ${{ secrets.CFA_PAT }}
+        GH_TOKEN: ${{ secrets.APPTEGY_PAT }}
 
     - name: Phase 1 - Create Release Branch
       id: phase1
@@ -96,7 +96,7 @@ jobs:
         echo "Pushing release branch ${{ inputs.RELEASE_BRANCH }} to remote"
         git push -u origin ${{ inputs.RELEASE_BRANCH }} --force
       env:
-        GH_TOKEN: ${{ secrets.CFA_PAT }}
+        GH_TOKEN: ${{ secrets.APPTEGY_PAT }}
 
     - name: Phase 2 - Change Log
       run: |
@@ -113,7 +113,7 @@ jobs:
         # Example usage of clog without the removed line
         docker run --rm 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog-tools:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.github_account }}/${{ inputs.repo_name }} -f ${{ inputs.BASE_BRANCH }} -t ${{ inputs.RELEASE_BRANCH }} -s  > changelog.txt
       env:
-        GH_TOKEN: ${{ secrets.CFA_PAT }}
+        GH_TOKEN: ${{ secrets.APPTEGY_PAT }}
 
     - name: Phase 3 - Release Pull Request
       run: |
@@ -125,4 +125,4 @@ jobs:
         pr_body=$(cat changelog.txt)
         gh pr create --base ${{ inputs.BASE_BRANCH }} --head ${{ inputs.RELEASE_BRANCH }} --title "$pr_title" --body "$pr_body"
       env:
-        GH_TOKEN: ${{ secrets.CFA_PAT }}
+        GH_TOKEN: ${{ secrets.APPTEGY_PAT }}
