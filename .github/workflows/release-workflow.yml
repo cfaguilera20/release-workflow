@@ -122,12 +122,6 @@ jobs:
 
         # Create a pull request using GitHub CLI
         pr_title=$(head -n 1 changelog.txt)
-        pr_title_before_version=$(echo $pr_title | cut -d " " -f 1)
-        pr_title_before_version=${pr_title_before_version//-/ }
-        pr_title_before_version= ${pr_title_before_version^}
-        pr_title_version=$(echo $pr_title | cut -d " " -f 2)
-        pr_title="$pr_title_before_version $pr_title_version"
-
         pr_body=$(cat changelog.txt)
         gh pr create --base ${{ inputs.BASE_BRANCH }} --head ${{ inputs.RELEASE_BRANCH }} --title "$pr_title" --body "$pr_body"
       env:
