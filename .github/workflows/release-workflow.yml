@@ -52,13 +52,33 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Delete existing 'release' branch on remote
-      run: gh repo delete-branch ${{ inputs.github_account }}/${{ inputs.release_branch }} || echo "Branch does not exist on remote"
+      run: |
+        if [[ "${{ inputs.release_branch }}" != "master" && "${{ inputs.release_branch }}" != "develop" && "${{ inputs.release_branch }}" != "main" ]]; then
+          echo "Deleting branch ${{ inputs.release_branch }} skipped"
+          exit 0
+        fi
+
+        echo "Deleting release branch ${{ inputs.release_branch }}"
+        gh repo delete-branch ${{ inputs.github_account }}/${{ inputs.release_branch }} || echo "Branch does not exist on remote"
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
 
     - name: Phase 1 - Create Release Branch
       id: phase1
       run: |
+        if "${{ inputs.release_branch }}" == "${{ inputs.develop_branch }}" ]]; then
+          echo "Release branch is a permanent branch, skipping..."
+
+          if [ -z "${{ inputs.commit_hash }}" ]; then
+            echo "Commit hash is empty, you must provide a different release branch or and empty commit hash"
+            exit 1
+          fi
+
+          exit 0
+        fi
+
+        echo "Creating release branch ${{ inputs.release_branch }} from ${{ inputs.develop_branch }}"
+
         mkdir -p workspace
         git clone https://${{ env.GH_TOKEN }}@github.com/${{ inputs.github_account }}/${{ inputs.repo_name }}.git workspace/${{ inputs.repo_name }}
 
@@ -73,6 +93,7 @@ jobs:
           git reset --hard $commit_hash
         fi
 
+        echo "Pushing release branch ${{ inputs.RELEASE_BRANCH }} to remote"
         git push -u origin ${{ inputs.RELEASE_BRANCH }} --force
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
@@ -90,7 +111,7 @@ jobs:
         docker build clog -t 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest
 
         # Example usage of clog without the removed line
-        docker run --rm -i 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.github_account }}/${{ inputs.repo_name }} -f release -t ${{ inputs.BASE_BRANCH }} > changelog.txt
+        docker run --rm 124252578199.dkr.ecr.us-east-2.amazonaws.com/clog-tools:latest -a ${{ env.GH_TOKEN }} -r ${{ inputs.github_account }}/${{ inputs.repo_name }} -f ${{ inputs.BASE_BRANCH }} -t ${{ inputs.RELEASE_BRANCH }} -s  > changelog.txt
       env:
         GH_TOKEN: ${{ secrets.CFA_PAT }}
 
